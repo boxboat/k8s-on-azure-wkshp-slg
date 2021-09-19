@@ -13,7 +13,7 @@ author:
     title: About Author
     title_url: '#'
     external_url: true
-    description: Facundo is a senior solutions architect at BoxBoat. He's been working with Azure for a while and wants to continue that trend.
+    description: Facundo is a senior solutions architect at BoxBoat. He's been working with Azure. Sometimes, he goes by Frank.
 
 # Micro navigation
 micro_nav: true
