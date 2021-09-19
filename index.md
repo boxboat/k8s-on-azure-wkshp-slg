@@ -5,7 +5,7 @@ keywords:
 
 # Hero section
 title: "Cloud-Native Workshop: Know your options for Kubernetes on Azure"
-description: by BoxBoat
+description: by BoxBoat, an IBM Company
 buttons:
     - content: Slides
       url: '/slides/boxboat-workshop-slides.pdf'
@@ -13,13 +13,6 @@ buttons:
     - content: GitHub
       url: 'https://github.com/boxboat/k8s-on-azure-wkshp'
       external_url: true
-
-# # Author box
-# author:
-#     title: About Authors
-#     title_url: '#'
-#     external_url: true
-#     description: Faheem and Facundo are both solutions architects at BoxBoat specializing in Kubernetes on Azure.
 
 # Grid navigation
 grid_navigation:
