@@ -14,7 +14,7 @@ doks:
             logo:
                 text: 
                 image: true
-            copyright: Copyright &copy; 2021. - BoxBoat <br>All rights reserved.
+            copyright: Copyright &copy; 2021. - BoxBoat, an IBM Company <br>All rights reserved.
         social_list:
             - network_name: twitter
               profile_url: 'https://twitter.com/boxboat'
