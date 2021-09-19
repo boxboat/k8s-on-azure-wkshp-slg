@@ -14,8 +14,8 @@ micro_nav: true
 # Page navigation
 page_nav:
     next: 
-        content: Lab - Docker
-        url: '/lab-docker'
+        content: Lab - Intro to Azure Kubernetes Service (AKS)
+        url: '/lab-aks'
 ---
 
 ## Pre-Requisites
