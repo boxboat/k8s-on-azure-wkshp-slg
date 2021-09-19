@@ -5,15 +5,15 @@ keywords:
 comments: false
 
 # Hero section
-title: Lab - Docker
-description: Let's get started with Docker! 
+title: Lab - Intro to Azure Kubernetes Service (AKS)
+description: Let's get started with AKS!
 
 # Author box
 author:
     title: About Author
     title_url: '#'
     external_url: true
-    description: Faheem is a senior solutions architect at BoxBoat. He's delivered projects n various clouds. Azure remains his favorite.
+    description: Facundo is a senior solutions architect at BoxBoat. He's been working with Azure for a while and wants to continue that trend.
 
 # Micro navigation
 micro_nav: true
@@ -24,8 +24,8 @@ page_nav:
         content: Home
         url: '/'
     next:
-        content: Lab - Kubernetes
-        url: '/lab-kubernetes'
+        content: Lab - Intro to Azure RedHat OpenShift (ARO)
+        url: '/lab-aro'
 ---
 
 ## Install Docker Desktop

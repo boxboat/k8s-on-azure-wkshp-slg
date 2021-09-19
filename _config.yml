@@ -1,10 +1,10 @@
 # Theme settings
 doks:
-    baseurl: /aks-wkshp-1
+    baseurl: /k8s-on-azure-wkshp
     color_theme: blue # Available themes: blue (default), green, purple, red and yellow
     header:
         logo:
-            text: BoxBoat Cloud-Native Workshop
+            text: BoxBoat's Kubernetes on Azure Workshop
             image: false
         nav:
             - item_name: Resources
