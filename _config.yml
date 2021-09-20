@@ -4,7 +4,7 @@ doks:
     color_theme: blue # Available themes: blue (default), green, purple, red and yellow
     header:
         logo:
-            text: BoxBoat's Kubernetes on Azure Workshop
+            text: BoxBoat's Cloud-Native Workshop
             image: false
         nav:
             - item_name: Resources
