@@ -21,192 +21,307 @@ micro_nav: true
 # Page navigation
 page_nav:
     prev:
-        content: Home
+        content: Pre-Requisites
         url: '/'
     next:
         content: Lab - Intro to Azure RedHat OpenShift (ARO)
         url: '/lab-aro'
 ---
 
-## Install Docker Desktop
+## Creating an AKS cluster
 
-Link: [Docker Desktop](https://www.docker.com/products/docker-desktop)
+First, let's create a resource group to place the material in.
 
-Once you have the Docker Desktop installed on your computer, launch a terminal and type the following command.
+``` shell
+az group create -g rg-boxboat-wkshp-[myname] -l eastus --tags owner=[myname] customer=Internal
+```
 
+Then, let's create an Azure Container registry (ACR).
+
+``` shell
+az acr create -g rg-boxboat-wkshp-[myname] -n [myname]BoxBoatWorkshopRegistry -l eastus --sku Standard
+```
+
+Now, let's create the Azure Kubernetes Service (AKS) cluster. This might take a while. Notice how it's using the `--attach-acr` flag. This flag tells the Azure CLI to configure the authentication for the ACR registry from the AKS cluster.
+
+``` shell
+az aks create -n azaks-boxboat-wkshp-[myname]-001 -g rg-boxboat-wkshp-[myname] --generate-ssh-keys --attach-acr [myname]BoxBoatWorkshopRegistry
+```
+
+Now, authenticate against the Azure Kubernetes Service. Notice how it configures the `~/.kube/config` file.
+``` shell
+az aks get-credentials --resource-group rg-boxboat-wkshp-[myname] --name azaks-boxboat-wkshp-[myname]-001
+```
+
+## Deploying an application
+
+> Note: If you don't have `kubectl`, run `az aks install-cli` to install `kubectl`
+
+Now, run clippy! But you won't be able to see it just yet.
+```
+kubectl run party-clippy --generator=run-pod/v1 --image=r.j3ss.co/party-clippy
+```
+
+Inspect the YAML
+``` shell
+kubectl get pod/party-clippy -o yaml
+```
+
+To see clippy, we must espose the pod to the internet. Let's create a Kubernetes _service_.
+
+``` shell
+kubectl expose pod/party-clippy --port 80 --target-port 8080 --type LoadBalancer
+```
+
+Now, view the YAML. 
 ```shell
-docker version
-
-# response
-Client: Docker Engine - Community
- Cloud integration: 1.0.4
- Version:           20.10.2
- API version:       1.41
- Go version:        go1.13.15
- Git commit:        2291f61
- Built:             Mon Dec 28 16:12:42 2020
- OS/Arch:           darwin/amd64
- Context:           default
- Experimental:      true
-
-Server: Docker Engine - Community
- Engine:
-  Version:          20.10.2
-  API version:      1.41 (minimum version 1.12)
-  Go version:       go1.13.15
-  Git commit:       8891c58
-  Built:            Mon Dec 28 16:15:23 2020
-  OS/Arch:          linux/amd64
-  Experimental:     false
- containerd:
-  Version:          v1.4.3
-  GitCommit:        269548fa27e0089a8b8278fc4fc781d7f65a939b
- runc:
-  Version:          1.0.0-rc92
-  GitCommit:        ff819c7e9184c13b7c2607fe6c30ae19403a7aff
- docker-init:
-  Version:          0.19.0
-  GitCommit:        de40ad0
+kubectl get service/party-clippy -o yaml
 ```
 
-`docker version` command shows you information regarding the client (Desktop CLI) and serer (Desktop Engine).
+You'll notice an IP Address under `status.IPAddress`. 
 
-## Pull and launch a container
-You can pull pre-built container images from external registries such as [Docker Hub](https://hub.docker.com). Let's pull and launch an `alpine` container.
+Open up your browser, type in the IP Address.
 
-**Step 1: Pull the container**
-```shell
-docker pull alpine
+Hello Clippy!
 
-# response
-Using default tag: latest
-latest: Pulling from library/alpine
-801bfaa63ef2: Pull complete 
-Digest: sha256:3c7497bf0c7af93428242d6176e8f7905f2201d8fc5861f45be7a346b5f23436
-Status: Downloaded newer image for alpine:latest
-docker.io/library/alpine:latest
+```
+ _________________________________
+/ It looks like you're building a \
+\ microservice.                   /
+ ---------------------------------
+ \
+  \
+     __
+    /  \
+    |  |
+    @  @
+    |  |
+    || |  /
+    || ||
+    |\_/|
+    \___/
 ```
 
-**Step 2: Run the container and connect shell into it**
-```shell
-docker run --name alpine -ti alpine
-# _
-```
-Docker CLI will launch the container, and you can run commands inside the Linux container. Please note that any file changes you make in this container will be ephemeral. For containers that need to preserve file changes, you need to mound an external volume into the container.
+## Deploying an application from your own container registry
 
-**Step 3: Stop and delete the container**
-You can `exit` out of the shell. It will also stop the container since there was no long-running process inside it. For example, in case of other applications, a web server will continue running as long as the web server process is running. Once your container is stopped, you can remove the container instance from the system.
+Now, in most scenarios, you won't be deploying an enterprise application from a public container registry. 
+Instead, you will be likely be using a private container registry like Azure Container Registry (ACR). 
 
-```shell
-docker rm alpine
-```
+Let's move the clippy container image into your _own_ container registry you created before.
 
-## Lunch a webserver
+Microsoft has clear documentation on how to do this. [See here](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-import-images#import-from-a-public-registry). They also provide options on how to import private container images from other registries into ACR.
 
-**Step 1: Lunch a webserver container.**
-
-```shell
-docker run --name hello-world -d -p 80:80 boxboat/hello-world
+``` shell
+az acr import --name [myname]BoxBoatWorkshopRegistry --source r.j3ss.co/party-clippy:latest --image=party-clippy:latest
 ```
 
-Notice that we didn't explicitly pull the `boxboat/hello-world` image from Docker hub. The CLI will notice that I don't have the image and it will pull it automatically.
- 
- * `-n` gives the container a name so you can interact 
- * `-d` runs the container in detached mode, which means the container will run in the background and we don't get shell into it.
- * `-p` maps the container network port with your host network. Containers run in a separate virtual network. Docker desktop helps you do the mapping between the two interfaces.
-
- **Step 2: Check the running containers**
- 
- ```shell
- docker ps
-
- #response
- CONTAINER ID   IMAGE                 COMMAND                  CREATED          STATUS          PORTS                NAMES
-b3c75af0d067   boxboat/hello-world   "/opt/hello-world/he…"   22 seconds ago   Up 18 seconds   0.0.0.0:80->80/tcp   hello-world
-```
-`docker ps` shows all running containers. We only have one at this point. You can also see the port mappings. You should be able to open a browser and view the website [http://localhost](http://localhost:80)
-
-**Step 3: Check container logs**
-```shell
-docker logs hello-world
+``` shell
+az acr repository list -n [myname]BoxBoatWorkshopRegistry
 ```
 
-**Step 4: Exec into the container**
-```shell
-docker exec -ti hello-world sh
-```
-Look around inside the container and when you are done, `exit` out of it.
+Now, since the `party-clippy` is in the container registry, let's re-deploy clippy so that the image being pulled comes from the private registry instead.
 
-**Step 5: Stop and cleanup**
-```shell
-docker stop hello-world
-docker rm hello-world
+``` shell
+kubectl get svc/party-clippy -o=jsonpath='{.status.loadBalancer.ingress[*].ip}'
 ```
 
-You can learn more about Docker CLI command [reference](https://docs.docker.com/engine/reference/commandline/docker/)
-
-## Build container images
-
-You can use a `Dockerfile` to build new container images. Dockerfile provides a simple syntax for building Linux or Windows containers. You can learn more about the Dockerfile [reference](https://docs.docker.com/engine/reference/builder/) Let's build a container for funfact application.
-
-```shell
-git pull git@github.com:faheem556/funfact.git
-cd funfact
-
-# build dotnet app
-docker build -t funfact:dotnet-1-0 -f dotnet/Dockerfile ./funfact/dotnet
-
-# build node image
-docker build -t funfact:node-1-0 -f nodejs/Dockerfile ./funfact/nodejs
-
-# build java image
-docker build -t funfact:java-1-0 -f java/Dockerfile ./funfact/java
+``` shell
+$ curl [ip from above]
+ _________________________________
+/ It looks like you're building a \
+\ microservice.                   /
+ ---------------------------------
+ \
+  \
+     __
+    /  \
+    |  |
+    @  @
+    |  |
+    || | /
+    || ||
+    |\_/|
+    \___/
 ```
 
-Example Dockerfile
-```dockerfile
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
-WORKDIR /app
+## Exploring features on AKS
 
-# Copy csproj and restore as distinct layers
-COPY *.csproj ./
-RUN dotnet restore
+Go to the Azure portal and try to do the following: 
 
-# Copy everything else and build
-COPY . ./
-RUN dotnet publish -c Release -o out
+- Find AKS Cluster
+- Find the node pool for that cluster
+- Find the VMs part of that node pool
 
-# Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:5.0
-WORKDIR /app
-COPY --from=build-env /app/out .
-ENTRYPOINT ["dotnet", "funfact.dll"]
+Great. Then, try to scale from 3 nodes to 2 nodes using the Azure portal. 
+
+If you want to use the Azure Cloud Shell, you can authenticate to the cluster using the following command:
+
+``` bash
+# authenticate to aks
+az aks get-credentials -n azaks-boxboat-wkshp-[myname]-001 -g rg-boxboat-wkshp-[myname]
+```
+
+Then, issuing `kubectl` commands to watch the node being removed.
+
+``` bash
+kubectl get nodes -w
+```
+
+Try scaling one more time. This time use the Azure CLI to remove another node and scale to a _single_ instance.
+
+``` shell
+# this takes some time
+az aks scale \
+    --name azaks-boxboat-wkshp-[myname]-001 \
+    --node-count 1 \
+    --resource-group rg-boxboat-wkshp-[myname]
+
+# see the status once again
+kubectl get nodes
+```
+
+Is clippy still running? We removed two nodes so far. 2/3 chances that it's not.
+
+``` shell
+kubectl get pods
+```
+
+## Making the application reliable
+
+Let's make Clippy reliable by making a Kubernetes deployment.
+
+You can keep using the Azure Cloud Shell, or authenticate from your own workstation (you'll have to `az login` first).
+
+Assumming you have VS Code (Cloud Shell already has it installed), then create a new `deployment.yaml` file.
+```
+code deployment.yaml
+```
+
+Then paste in this snippet and fill in the placeholders.
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clippy-deployment
+spec:
+  selector:
+    matchLabels:
+      app: clippy
+  template:
+    metadata:
+      labels:
+        app: clippy
+    spec:
+      containers:
+      - name: clippy
+        image: [myname]BoxBoatWorkshopRegistry.azurecr.io/party-clippy
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+```
+
+Deploy it.
+
+```
+kubectl apply -f deployment.yaml
+```
+
+Watch the deployment.
+
+``` 
+kubectl get deployment -w
+```
+
+Is Clippy running?
+
+Probably not. We haven't configured a service to point to the proper label. The previous load balancer we created was using the shortcut: `kubectl expose` which targeted a single pod. 
+
+Let's create a proper service. Create another file called `service.yaml`
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: clippy-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: clippy
+  ports:
+  - port: 80
+    targetPort: 8080
+```
+
+And, deploy it. 
+
+``` bash
+kubectl apply -f service.yaml
+```
+
+Great, wait for the public IP to be assigned (`External IP`).
+
+``` bash
+kubectl get svc -w
+```
+
+Once it finishes, is Clippy running now?
+
+``` shell
+$ curl "[External IP from Above]"
+
+ _________________________________
+/ It looks like you're building a \
+\ microservice.                   /
+ ---------------------------------
+ \
+  \
+     __
+    /  \
+    |  |
+    @  @
+    |  |
+    || | /
+    || ||
+    |\_/|
+    \___/
+```
+
+Great! Now that clippy is running. 
+
+Try stopping the AKS cluster (it will deallocate all the worker nodes) and re-creating it. 
+
+``` bash
+az aks stop \
+    --name  azaks-boxboat-wkshp-[myname]-001 \
+    --resource-group rg-boxboat-wkshp-[myname]
+
+az aks stop \
+    --name  azaks-boxboat-wkshp-[myname]-001 \
+    --resource-group rg-boxboat-wkshp-[myname]
+```
+
+When the cluster stops, Clippy's pod will die. 
+
+When the cluster starts-up, Clippy's pod will be re-created. 
+
+After it finishes, check-up on Clippy again. 
+
+
+That's it!
+
+Congrats and thanks for following-up on this lab!
+
+
+## Clean-Up
+
+Delete all the resources created in the resource group with
+
+```
+az group delete -g rg-boxboat-wkshp-[myname]
 ```
 
 
-Read through the code and docker files to understand the environment. It's straight-forward.
 
-Let's run the application now.
-
-```shell
-docker run --name funfactd -d --rm -p 8080:80 funfact:dotnet-1-0 
-docker run --name funfactn -d --rm -p 8081:80 funfact:node-1-0 
-docker run --name funfactj -d --rm -p 8082:80 funfact:java-1-0 
-docker ps
-```
-
-You should have three running containers at this point. If the container doesn't start for some reason, you can use `docker ps -a' and `docker log` to troubleshoot.
-
-Once the containers are up, open your browsers and try out the applications.
-
-**Cleanup**
-```shell
-docker stop funfactd
-docker rm funfactd
-
-docker stop funfactn
-docker rm funfactd
-
-docker stop funfactj
-docker rm funfactj
-```
