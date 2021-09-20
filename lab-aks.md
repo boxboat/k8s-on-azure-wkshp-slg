@@ -21,19 +21,14 @@ micro_nav: true
 # Page navigation
 page_nav:
     prev:
-        content: Home
+        content: Pre-Requisites
         url: '/'
     next:
         content: Lab - Intro to Azure RedHat OpenShift (ARO)
         url: '/lab-aro'
 ---
 
-## Pre-Requisites
-- Azure CLI
-- An Azure Subscription with **Contributor** rights
-- `kubectl`
-
-## Deploying Clippy
+## Creating an AKS cluster
 
 First, let's create a resource group to place the material in.
 
@@ -57,6 +52,8 @@ Now, authenticate against the Azure Kubernetes Service. Notice how it configures
 ``` shell
 az aks get-credentials --resource-group rg-boxboat-wkshp-[myname] --name azaks-boxboat-wkshp-[myname]-001
 ```
+
+## Deploying an application
 
 > Note: If you don't have `kubectl`, run `az aks install-cli` to install `kubectl`
 
@@ -105,7 +102,7 @@ Hello Clippy!
     \___/
 ```
 
-## Using your container registry
+## Deploying an application from your own container registry
 
 Now, in most scenarios, you won't be deploying an enterprise application from a public container registry. 
 Instead, you will be likely be using a private container registry like Azure Container Registry (ACR). 
@@ -152,13 +149,12 @@ $ curl [ip from above]
 Go to the Azure portal and try to do the following: 
 
 - Find AKS Cluster
-- Find the Azure Container Registry. Then enable geo-replication to another region.
 - Find the node pool for that cluster
 - Find the VMs part of that node pool
 
 Great. Then, try to scale from 3 nodes to 2 nodes using the Azure portal. 
 
-You can observe from the Azure Cloud Shell by:
+If you want to use the Azure Cloud Shell, you can authenticate to the cluster using the following command:
 
 ``` bash
 # authenticate to aks
@@ -173,9 +169,12 @@ kubectl get nodes -w
 
 Try scaling one more time. This time use the Azure CLI to remove another node and scale to a _single_ instance.
 
-```
+``` shell
 # this takes some time
-az aks scale --name azaks-boxboat-wkshp-[myname]-001 --node-count 1 --resource-group rg-boxboat-wkshp-[myname]
+az aks scale \
+    --name azaks-boxboat-wkshp-[myname]-001 \
+    --node-count 1 \
+    --resource-group rg-boxboat-wkshp-[myname]
 
 # see the status once again
 kubectl get nodes
@@ -187,9 +186,9 @@ Is clippy still running? We removed two nodes so far. 2/3 chances that it's not.
 kubectl get pods
 ```
 
-## Making Clippy reliable
+## Making the application reliable
 
-If clippy is not running, let's make it reliable by making a Kubernetes deployment.
+Let's make Clippy reliable by making a Kubernetes deployment.
 
 You can keep using the Azure Cloud Shell, or authenticate from your own workstation (you'll have to `az login` first).
 
@@ -270,8 +269,8 @@ kubectl get svc -w
 
 Once it finishes, is Clippy running now?
 
-``` bash
-$ curl [External IP from Above]
+``` shell
+$ curl "[External IP from Above]"
 
  _________________________________
 / It looks like you're building a \
@@ -295,9 +294,13 @@ Great! Now that clippy is running.
 Try stopping the AKS cluster (it will deallocate all the worker nodes) and re-creating it. 
 
 ``` bash
-az aks stop --name  azaks-boxboat-wkshp-[myname]-001 --resource-group rg-boxboat-wkshp-[myname]
+az aks stop \
+    --name  azaks-boxboat-wkshp-[myname]-001 \
+    --resource-group rg-boxboat-wkshp-[myname]
 
-az aks stop --name  azaks-boxboat-wkshp-[myname]-001 --resource-group rg-boxboat-wkshp-[myname]
+az aks stop \
+    --name  azaks-boxboat-wkshp-[myname]-001 \
+    --resource-group rg-boxboat-wkshp-[myname]
 ```
 
 When the cluster stops, Clippy's pod will die. 
