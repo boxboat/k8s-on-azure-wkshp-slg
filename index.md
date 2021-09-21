@@ -17,7 +17,7 @@ buttons:
 # Grid navigation
 grid_navigation:
     - title: 0. Pre-Requisites
-      excerpt: "Let's get you set-up"
+      excerpt: "New to Azure? Don't worry. We will give you a temporary account."
       cta: Read More
       url: '/lab-prerequisites'
     - title: 1. Lab - Intro to Azure Kubernetes Service (AKS)
