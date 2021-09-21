@@ -315,7 +315,7 @@ That's it!
 Congrats and thanks for following-up on this lab!
 
 
-## Clean-Up
+## Clean-up
 
 Delete all the resources created in the resource group with
 
