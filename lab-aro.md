@@ -58,19 +58,88 @@ CLUSTER=cluster
 
 Verify your vCPU quota is sufficient to deploy ARO (at least 40 vCPUs):
 
-```
+```bash
 az vm list-usage -l $LOCATION \
 --query "[?contains(name.value, 'standardDSv3Family')]" \
 -o table
 ```
 
 Register necessary resource providers in your Azure Subscription:
-```
+
+```bash
 az provider register -n Microsoft.RedHatOpenShift --wait
 az provider register -n Microsoft.Compute --wait
 az provider register -n Microsoft.Storage --wait
 az provider register -n Microsoft.Authorization --wait
 ```
+
+__(Optional but Recommended)__
+Obtain a Red Hat pull secret to enable your cluster to access exclusive Red Hat content and tools.
+[Download your pull secret from here.](https://cloud.redhat.com/openshift/install/azure/aro-provisioned)
+
+Create a resource group:
+
+```bash
+az group create \
+  --name $RESOURCEGROUP \
+  --location $LOCATION
+```
+
+Create a virtual network:
+
+```bash
+az network vnet create \
+   --resource-group $RESOURCEGROUP \
+   --name aro-vnet \
+   --address-prefixes 10.0.0.0/22
+```
+
+Create an empty subnet for the __master nodes__:
+
+```bash
+az network vnet subnet create \
+  --resource-group $RESOURCEGROUP \
+  --vnet-name aro-vnet \
+  --name master-subnet \
+  --address-prefixes 10.0.0.0/23 \
+  --service-endpoints Microsoft.ContainerRegistry
+```
+
+Create an empty subnet for the __worker nodes__:
+
+```bash
+az network vnet subnet create \
+  --resource-group $RESOURCEGROUP \
+  --vnet-name aro-vnet \
+  --name worker-subnet \
+  --address-prefixes 10.0.2.0/23 \
+  --service-endpoints Microsoft.ContainerRegistry
+```
+
+[Disable subnet private endpoint policies](https://docs.microsoft.com/en-us/azure/private-link/disable-private-link-service-network-policy) on the master subnet.
+
+```bash
+az network vnet subnet update \
+  --name master-subnet \
+  --resource-group $RESOURCEGROUP \
+  --vnet-name aro-vnet \
+  --disable-private-link-service-network-policies true
+```
+
+### Create the cluster
+
+If you obtained a pull secret, you can append `--pull-secret @pull-secret.txt` to the following command when creating your cluster. Otherwise, you can run the following command as it is:
+
+```bash
+az aro create \
+  --resource-group $RESOURCEGROUP \
+  --name $CLUSTER \
+  --vnet aro-vnet \
+  --master-subnet master-subnet \
+  --worker-subnet worker-subnet
+```
+
+Once you run `az aro create`, it usually takes around 30 minutes for the cluster to be fully operational. Once it's ready, continue to the next section to connect to your cluster.
 
 ## Connecting to an ARO cluster
 
