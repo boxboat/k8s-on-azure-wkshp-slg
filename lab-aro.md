@@ -27,12 +27,13 @@ page_nav:
 
 ## Prerequisites
 
-* [Request an increase for vCPU quota.](https://docs.microsoft.com/en-us/azure/azure-portal/supportability/per-vm-quota-requests) (Minimum of 36 for ARO)
+* [Request an increase for vCPU quota.](https://docs.microsoft.com/en-us/azure/azure-portal/supportability/per-vm-quota-requests) (Minimum of 36 vCPU for ARO)
 * Create a Red Hat account at [https://console.redhat.com](https://console.redhat.com)
 
 ## Resources
 
 * [Microsoft Docs](https://docs.microsoft.com/azure/openshift)
+* [Red Hat Docs](https://docs.openshift.com/aro/4/welcome/index.html)
 
 ## Creating an AKS cluster
 
