@@ -31,8 +31,8 @@ page_nav:
 
 - [Request an increase for vCPU quota.](https://docs.microsoft.com/en-us/azure/azure-portal/supportability/per-vm-quota-requests) (Minimum of 40 vCPU for ARO).
 - Create a Red Hat account at [https://console.redhat.com](https://console.redhat.com).
-- __(Optional but Recommended)__ Obtain a Red Hat pull secret to enable your cluster to access exclusive Red Hat content and tools. [Download your pull secret from here.](https://cloud.redhat.com/openshift/install/azure/aro-provisioned)
 - [Azure CLI](https://boxboat.github.io/k8s-on-azure-wkshp/lab-prerequisites/#3-optional-using-the-azure-cli) version 2.6.0 or later
+- Obtain a Red Hat pull secret to enable your cluster to access exclusive Red Hat content and tools. [Download your pull secret from here.](https://cloud.redhat.com/openshift/install/azure/aro-provisioned)
 
 ### Resources
 
@@ -121,7 +121,7 @@ az network vnet subnet update \
 
 ### Create the cluster
 
-If you obtained a pull secret, you can append `--pull-secret @pull-secret.txt` to the following command when creating your cluster. Otherwise, you can run the following command as it is:
+Run the following command to create your cluster. Ensure that `@pull-secret.txt` is the actual path to your pull secret file that you downloaded during the prerequisites.
 
 ```bash
 az aro create \
@@ -129,17 +129,71 @@ az aro create \
   --name $CLUSTER \
   --vnet aro-vnet \
   --master-subnet master-subnet \
-  --worker-subnet worker-subnet
+  --worker-subnet worker-subnet \
+  --pull-secret @pull-secret.txt
 ```
 
 Once you run `az aro create`, it usually takes around 30 minutes for the cluster to be fully operational. Once it's ready, continue to the next section to connect to your cluster.
 
 ## Connecting to an ARO cluster
 
-## Exploring an ARO cluster via Web Console
+### Web Console
+
+Obtain the web console URL for your cluster:
+
+```bash
+az aro show \
+    --name $CLUSTER \
+    --resource-group $RESOURCEGROUP \
+    --query "consoleProfile.url" -o tsv
+```
+
+Open the link that is returned in your browser.
+
+Return to your terminal and obtain the credentials to your cluster:
+
+```bash
+az aro list-credentials \
+  --name $CLUSTER \
+  --resource-group $RESOURCEGROUP
+```
+
+The credentials you just received can be used to log into the web console. Return to your browser and give it a try!
+
+### Command Line
+
+Install the appropriate version of the [OpenShift CLI](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/) tool for your machine.
+
+Retrieve the address of you OpenShift API:
+
+```bash
+apiServer=$(az aro show -g $RESOURCEGROUP -n $CLUSTER --query apiserverProfile.url -o tsv)
+```
+
+Obtain the credentials to your cluster:
+
+```bash
+az aro list-credentials \
+  --name $CLUSTER \
+  --resource-group $RESOURCEGROUP
+```
+
+Log in to your cluster:
+
+```bash
+oc login $apiServer -u kubeadmin -p <kubeadmin password>
+```
 
 ## Connecting an ARO cluster to the Hybrid Cloud Console
 
 ## Deploy a workload to ARO
 
 ## Clean-Up
+
+Once you are ready to dispose of your ARO cluster, you can run the following command:
+
+```bash
+az aro delete --resource-group $RESOURCEGROUP --name $CLUSTER
+```
+
+Upon completion, all resources belonging to your ARO cluster will be deleted.
