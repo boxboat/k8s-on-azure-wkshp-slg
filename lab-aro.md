@@ -31,6 +31,7 @@ page_nav:
 
 - [Request an increase for vCPU quota.](https://docs.microsoft.com/en-us/azure/azure-portal/supportability/per-vm-quota-requests) (Minimum of 40 vCPU for ARO).
 - Create a Red Hat account at [https://console.redhat.com](https://console.redhat.com).
+- __(Optional but Recommended)__ Obtain a Red Hat pull secret to enable your cluster to access exclusive Red Hat content and tools. [Download your pull secret from here.](https://cloud.redhat.com/openshift/install/azure/aro-provisioned)
 - [Azure CLI](https://boxboat.github.io/k8s-on-azure-wkshp/lab-prerequisites/#3-optional-using-the-azure-cli) version 2.6.0 or later
 
 ### Resources
@@ -75,10 +76,6 @@ az provider register -n Microsoft.Storage --wait
 az provider register -n Microsoft.Authorization --wait
 ```
 
-__(Optional but Recommended)__
-Obtain a Red Hat pull secret to enable your cluster to access exclusive Red Hat content and tools.
-[Download your pull secret from here.](https://cloud.redhat.com/openshift/install/azure/aro-provisioned)
-
 ### Deploy the foundation
 Create a resource group:
 
@@ -119,7 +116,7 @@ az network vnet subnet create \
   --service-endpoints Microsoft.ContainerRegistry
 ```
 
-[Disable subnet private endpoint policies](https://docs.microsoft.com/en-us/azure/private-link/disable-private-link-service-network-policy) on the master subnet.
+[Disable subnet private endpoint policies](https://docs.microsoft.com/en-us/azure/private-link/disable-private-link-service-network-policy) on the master subnet:
 
 ```bash
 az network vnet subnet update \
