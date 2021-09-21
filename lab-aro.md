@@ -25,6 +25,15 @@ page_nav:
         url: '/lab-aks'
 ---
 
+## Prerequisites
+
+* [Request an increase for vCPU quota.](https://docs.microsoft.com/en-us/azure/azure-portal/supportability/per-vm-quota-requests) (Minimum of 36 for ARO)
+* Create a Red Hat account at [https://console.redhat.com](https://console.redhat.com)
+
+## Resources
+
+* [Microsoft Docs](https://docs.microsoft.com/azure/openshift)
+
 ## Creating an AKS cluster
 
 ## Clean-Up
