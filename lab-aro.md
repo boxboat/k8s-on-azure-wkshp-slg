@@ -39,13 +39,6 @@ page_nav:
 - [Microsoft Docs](https://docs.microsoft.com/azure/openshift)
 - [Red Hat Docs](https://docs.openshift.com/aro/4/welcome/index.html)
 
-### Goals
-
-- Create an ARO Cluster.
-- Connect to cluster via command line.
-- Explore cluster via web console.
-- Connect cluster to Red Hat Hybrid Cloud Console.
-- Deploy a workload to cluster.
 
 ## Creating an ARO cluster
 
