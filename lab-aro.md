@@ -79,7 +79,7 @@ __(Optional but Recommended)__
 Obtain a Red Hat pull secret to enable your cluster to access exclusive Red Hat content and tools.
 [Download your pull secret from here.](https://cloud.redhat.com/openshift/install/azure/aro-provisioned)
 
-### Deploy Foundation
+### Deploy the foundation
 Create a resource group:
 
 ```bash
