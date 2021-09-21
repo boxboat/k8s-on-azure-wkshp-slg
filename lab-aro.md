@@ -35,6 +35,12 @@ page_nav:
 * [Microsoft Docs](https://docs.microsoft.com/azure/openshift)
 * [Red Hat Docs](https://docs.openshift.com/aro/4/welcome/index.html)
 
+## Goals
+- [] test check box
+- []test check box
+[] test check box
+[]test check box
+
 ## Creating an AKS cluster
 
 ## Clean-Up
