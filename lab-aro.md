@@ -36,6 +36,7 @@ page_nav:
 * [Red Hat Docs](https://docs.openshift.com/aro/4/welcome/index.html)
 
 ## Goals
+
 - [] test check box
 - []test check box
 [] test check box
