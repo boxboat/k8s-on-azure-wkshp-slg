@@ -25,18 +25,20 @@ page_nav:
         url: '/lab-aks'
 ---
 
-## Prerequisites
+## Intro
+
+### Prerequisites
 
 - [Request an increase for vCPU quota.](https://docs.microsoft.com/en-us/azure/azure-portal/supportability/per-vm-quota-requests) (Minimum of 40 vCPU for ARO).
 - Create a Red Hat account at [https://console.redhat.com](https://console.redhat.com).
 - [Azure CLI](https://boxboat.github.io/k8s-on-azure-wkshp/lab-prerequisites/#3-optional-using-the-azure-cli) version 2.6.0 or later
 
-## Resources
+### Resources
 
 - [Microsoft Docs](https://docs.microsoft.com/azure/openshift)
 - [Red Hat Docs](https://docs.openshift.com/aro/4/welcome/index.html)
 
-## Goals
+### Goals
 
 - Create an ARO Cluster.
 - Connect to cluster via command line.
