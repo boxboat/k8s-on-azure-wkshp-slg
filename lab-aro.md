@@ -13,7 +13,7 @@ author:
     title: About Author
     title_url: '#'
     external_url: true
-    description: Justin is a solutions architect at BoxBoat. He was been working with Azure for many years. Sometimes, he goes by Jimmy.
+    description: Justin is a Solutions Architect at BoxBoat. He was been working with Azure for many years. Sometimes, he goes by Jimmy.
 
 # Micro navigation
 micro_nav: true
