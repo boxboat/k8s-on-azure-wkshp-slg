@@ -208,27 +208,23 @@ After a few moments, you can visit the [Red Had Hybrid Cloud Console](https://co
 
 ## Deploy an application to ARO
 
+In this example, we will deploy a sample website:
+
 ```
 oc run party-clippy --generator=run-pod/v1 --image=r.j3ss.co/party-clippy
 ```
 
-Inspect the YAML
-``` shell
-oc get pod/party-clippy -o yaml
-```
-
-To see clippy, we must espose the pod to the internet. Let's create a Kubernetes _service_.
+Now that the website is deployed, we can expose it to the internet. Let's create a Kubernetes _service_:
 
 ``` shell
 oc expose pod/party-clippy --port 80 --target-port 8080 --type LoadBalancer
 ```
 
-Now, view the YAML. 
+Now we need to obtain the IP Address where our website is available. Run the following command and obtain the `EXTERNAL-IP` address. You may need to wait a few moments for the external IP Address to be populated.
+
 ```shell
 oc get service/party-clippy
 ```
-
-You'll notice an IP Address under `status.IPAddress`. 
 
 Open up your browser, type in the IP Address.
 
