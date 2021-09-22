@@ -8,7 +8,7 @@ title: "Cloud-Native Workshop: Know your options for Kubernetes on Azure"
 description: by BoxBoat, an IBM Company
 buttons:
     - content: Slides
-      url: '/slides/boxboat-workshop-slides.pdf'
+      url: '/raw/main/slides/boxboat-workshop-slides.pdf'
       external_url: false
     - content: GitHub
       url: 'https://github.com/boxboat/k8s-on-azure-wkshp'
