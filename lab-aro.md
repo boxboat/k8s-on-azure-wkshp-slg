@@ -186,7 +186,71 @@ oc login $apiServer -u kubeadmin -p <kubeadmin password>
 
 ## Connecting an ARO cluster to the Hybrid Cloud Console
 
-## Deploy a workload to ARO
+Obtain the pull secrets file from your cluster. The following command saves this as a JSON file.
+
+```bash
+oc get secrets pull-secret -n openshift-config -o template='{{index .data ".dockerconfigjson"}}' | base64 -d > pull-secrets.json
+```
+
+Open `pull-secrets.txt` that you previously obtained from console.redhat.com and copy the `cloud.openshift.com` object from that file into `pull-secrets.json. Once done, validate your json with the following command:
+
+```bash
+cat pull-secret.json | jq
+```
+
+And lastly, push that json file back to your cluster with the following command:
+
+```bash
+oc set data secret/pull-secret -n openshift-config --from-file=.dockerconfigjson=./pull-secret.json
+```
+
+After a few moments, you can visit the [Red Had Hybrid Cloud Console](https://console.redhat.com/openshift) and view your cluster and all the telemetry being sent there.
+
+## Deploy an application to ARO
+
+```
+oc run party-clippy --generator=run-pod/v1 --image=r.j3ss.co/party-clippy
+```
+
+Inspect the YAML
+``` shell
+oc get pod/party-clippy -o yaml
+```
+
+To see clippy, we must espose the pod to the internet. Let's create a Kubernetes _service_.
+
+``` shell
+oc expose pod/party-clippy --port 80 --target-port 8080 --type LoadBalancer
+```
+
+Now, view the YAML. 
+```shell
+oc get service/party-clippy
+```
+
+You'll notice an IP Address under `status.IPAddress`. 
+
+Open up your browser, type in the IP Address.
+
+Hello Clippy!
+
+```
+ _________________________________
+/ It looks like you're building a \
+\ microservice.                   /
+ ---------------------------------
+ \
+  \
+     __
+    /  \
+    |  |
+    @  @
+    |  |
+    || |  /
+    || ||
+    |\_/|
+    \___/
+```
 
 ## Clean-Up
 
