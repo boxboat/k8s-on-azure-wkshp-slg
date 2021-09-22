@@ -211,7 +211,7 @@ After a few moments, you can visit the [Red Had Hybrid Cloud Console](https://co
 In this example, we will deploy a sample website:
 
 ```
-oc run party-clippy --generator=run-pod/v1 --image=r.j3ss.co/party-clippy
+oc run party-clippy --image=r.j3ss.co/party-clippy
 ```
 
 Now that the website is deployed, we can expose it to the internet. Let's create a Kubernetes _service_:
