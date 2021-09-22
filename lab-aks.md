@@ -33,24 +33,35 @@ page_nav:
 First, let's create a resource group to place the material in.
 
 ``` shell
-az group create -g rg-boxboat-wkshp-[myname] -l eastus --tags owner=[myname] customer=Internal
+az group create -g rg-boxboat-wkshp -l eastus
 ```
 
-Then, let's create an Azure Container registry (ACR).
+Then, let's create an Azure Container registry (ACR). Please use your name instead of `[myname]`. Azure Container Registries names have to be globally unique to all of Azure.
 
 ``` shell
-az acr create -g rg-boxboat-wkshp-[myname] -n [myname]BoxBoatWorkshopRegistry -l eastus --sku Standard
+az acr create \
+    -g rg-boxboat-wkshp \
+    -n [myname]WorkshopRegistry \
+    -l eastus --sku Standard
 ```
 
-Now, let's create the Azure Kubernetes Service (AKS) cluster. This might take a while. Notice how it's using the `--attach-acr` flag. This flag tells the Azure CLI to configure the authentication for the ACR registry from the AKS cluster.
+Now, let's create the Azure Kubernetes Service (AKS) cluster. This might take a while. Notice how it's using the `--attach-acr` flag. This flag tells the Azure CLI to configure the authentication for the ACR registry from the AKS cluster. Notice the `[myname]` placeholder again.
 
 ``` shell
-az aks create -n azaks-boxboat-wkshp-[myname]-001 -g rg-boxboat-wkshp-[myname] --generate-ssh-keys --attach-acr [myname]BoxBoatWorkshopRegistry
+az aks create \
+    -n azaks-boxboat-wkshp-001 \
+    -g rg-boxboat-wkshp \
+    -l eastus
+    --generate-ssh-keys \
+    --attach-acr [myname]WorkshopRegistry
 ```
 
 Now, authenticate against the Azure Kubernetes Service. Notice how it configures the `~/.kube/config` file.
+
 ``` shell
-az aks get-credentials --resource-group rg-boxboat-wkshp-[myname] --name azaks-boxboat-wkshp-[myname]-001
+az aks get-credentials \
+    --resource-group rg-boxboat-wkshp \
+    --name azaks-boxboat-wkshp-001
 ```
 
 ## Deploying an application
@@ -58,11 +69,15 @@ az aks get-credentials --resource-group rg-boxboat-wkshp-[myname] --name azaks-b
 > Note: If you don't have `kubectl`, run `az aks install-cli` to install `kubectl`
 
 Now, run clippy! But you won't be able to see it just yet.
-```
-kubectl run party-clippy --generator=run-pod/v1 --image=r.j3ss.co/party-clippy
+
+``` shell
+kubectl run party-clippy \
+    --generator=run-pod/v1 \
+    --image=r.j3ss.co/party-clippy
 ```
 
 Inspect the YAML
+
 ``` shell
 kubectl get pod/party-clippy -o yaml
 ```
@@ -70,10 +85,14 @@ kubectl get pod/party-clippy -o yaml
 To see clippy, we must espose the pod to the internet. Let's create a Kubernetes _service_.
 
 ``` shell
-kubectl expose pod/party-clippy --port 80 --target-port 8080 --type LoadBalancer
+kubectl expose pod/party-clippy \
+    --port 80 \
+    --target-port 8080 \
+    --type LoadBalancer
 ```
 
 Now, view the YAML. 
+
 ```shell
 kubectl get service/party-clippy -o yaml
 ```
@@ -84,7 +103,7 @@ Open up your browser, type in the IP Address.
 
 Hello Clippy!
 
-```
+``` shell
  _________________________________
 / It looks like you're building a \
 \ microservice.                   /
@@ -112,21 +131,26 @@ Let's move the clippy container image into your _own_ container registry you cre
 Microsoft has clear documentation on how to do this. [See here](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-import-images#import-from-a-public-registry). They also provide options on how to import private container images from other registries into ACR.
 
 ``` shell
-az acr import --name [myname]BoxBoatWorkshopRegistry --source r.j3ss.co/party-clippy:latest --image=party-clippy:latest
+az acr import \
+    --name [myname]WorkshopRegistry \
+    --source r.j3ss.co/party-clippy:latest \
+    --image=party-clippy:latest
 ```
 
 ``` shell
-az acr repository list -n [myname]BoxBoatWorkshopRegistry
+az acr repository list \
+    -n [myname]WorkshopRegistry
 ```
 
 Now, since the `party-clippy` is in the container registry, let's re-deploy clippy so that the image being pulled comes from the private registry instead.
 
 ``` shell
-kubectl get svc/party-clippy -o=jsonpath='{.status.loadBalancer.ingress[*].ip}'
+kubectl get svc/party-clippy \
+    -o=jsonpath='{.status.loadBalancer.ingress[*].ip}'
 ```
 
 ``` shell
-$ curl [ip from above]
+$ curl "[External IP from Above]"
  _________________________________
 / It looks like you're building a \
 \ microservice.                   /
@@ -152,13 +176,15 @@ Go to the Azure portal and try to do the following:
 - Find the node pool for that cluster
 - Find the VMs part of that node pool
 
-Great. Then, try to scale from 3 nodes to 2 nodes using the Azure portal. 
+Great. Then, try to scale from **3** nodes to **2** nodes using the Azure portal. 
 
-If you want to use the Azure Cloud Shell, you can authenticate to the cluster using the following command:
+If you want to use the **Azure Cloud Shell**, you can authenticate to the cluster using the following command:
 
 ``` bash
 # authenticate to aks
-az aks get-credentials -n azaks-boxboat-wkshp-[myname]-001 -g rg-boxboat-wkshp-[myname]
+az aks get-credentials \
+    -n azaks-boxboat-wkshp-001 \
+    -g rg-boxboat-wkshp
 ```
 
 Then, issuing `kubectl` commands to watch the node being removed.
@@ -172,9 +198,9 @@ Try scaling one more time. This time use the Azure CLI to remove another node an
 ``` shell
 # this takes some time
 az aks scale \
-    --name azaks-boxboat-wkshp-[myname]-001 \
+    --name azaks-boxboat-wkshp-001 \
     --node-count 1 \
-    --resource-group rg-boxboat-wkshp-[myname]
+    --resource-group rg-boxboat-wkshp
 
 # see the status once again
 kubectl get nodes
@@ -214,7 +240,7 @@ spec:
     spec:
       containers:
       - name: clippy
-        image: [myname]BoxBoatWorkshopRegistry.azurecr.io/party-clippy
+        image: [myname]WorkshopRegistry.azurecr.io/party-clippy
         resources:
           limits:
             memory: "128Mi"
@@ -295,12 +321,12 @@ Try stopping the AKS cluster (it will deallocate all the worker nodes) and re-cr
 
 ``` bash
 az aks stop \
-    --name  azaks-boxboat-wkshp-[myname]-001 \
-    --resource-group rg-boxboat-wkshp-[myname]
+    --name  azaks-boxboat-wkshp-001 \
+    --resource-group rg-boxboat-wkshp
 
 az aks stop \
-    --name  azaks-boxboat-wkshp-[myname]-001 \
-    --resource-group rg-boxboat-wkshp-[myname]
+    --name  azaks-boxboat-wkshp-001 \
+    --resource-group rg-boxboat-wkshp
 ```
 
 When the cluster stops, Clippy's pod will die. 
@@ -320,7 +346,7 @@ Congrats and thanks for following-up on this lab!
 Delete all the resources created in the resource group with
 
 ```
-az group delete -g rg-boxboat-wkshp-[myname]
+az group delete -g rg-boxboat-wkshp
 ```
 
 
