@@ -2,6 +2,14 @@
 
 Repository with labs that attendes can follow at their own pace.
 
+## First Time
+
+docker run --rm \
+  --volume="$PWD:/srv/jekyll" \
+  -p 4000:4000 \
+  jekyll/jekyll \
+  bundle install
+
 ## Running Locally
 
 ``` shell
